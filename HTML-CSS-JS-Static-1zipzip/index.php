@@ -1,0 +1,434 @@
+<?php
+require_once 'config/config.php';
+if (isLoggedIn()) { header("Location: dashboard.php"); exit(); }
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
+?><!DOCTYPE html>
+<html lang="ar" dir="rtl" data-lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kozhen Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap">
+<style>
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_Light.woff2') format('woff2');font-weight:300}
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_Medium.woff2') format('woff2');font-weight:500}
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_SemiBold.woff2') format('woff2');font-weight:600}
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_Bold.woff2') format('woff2');font-weight:700}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#ffffff;
+  --bg2:#f7f7f7;
+  --fg:#0a0a0a;
+  --fg2:#444444;
+  --fg3:#999999;
+  --border:#e8e8e8;
+  --teal:#00a99d;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:'GraphikArabic','Noto Naskh Arabic','Tajawal',sans-serif;
+  background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:repeating-linear-gradient(-45deg,#000 0,#000 1px,transparent 1px,transparent 44px);
+  opacity:.03;
+}
+
+/* ── NAV ── */
+nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;height:70px;position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo-wrap{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-img{width:54px;height:54px;object-fit:contain;border-radius:10px}
+.logo-name{font-size:1.15rem;font-weight:700;color:var(--fg);letter-spacing:-0.3px}
+
+.nav-right{display:flex;align-items:center;gap:8px}
+
+.lang-btn{
+  padding:0 14px;height:36px;border-radius:50px;border:1px solid var(--border);
+  background:transparent;color:var(--fg);cursor:pointer;
+  font-family:'GraphikArabic','Noto Naskh Arabic',sans-serif;font-size:13px;font-weight:600;
+  transition:background .2s;display:flex;align-items:center;gap:6px;
+}
+.lang-btn:hover{background:var(--bg2)}
+.lang-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+
+.btn-icon-nav{
+  width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);background:transparent;color:var(--fg);
+  text-decoration:none;transition:background .2s,transform .15s;flex-shrink:0;
+}
+.btn-icon-nav svg{width:17px;height:17px}
+.btn-icon-nav:hover{background:var(--bg2)}
+.btn-icon-solid{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn-icon-solid svg{stroke:var(--bg)}
+.btn-icon-solid:hover{opacity:.85;transform:translateY(-1px);background:var(--fg)}
+
+/* ── PAYMENT SLIDER (moved up, right below nav) ── */
+.payment-section{
+  border-bottom:1px solid var(--border);
+  background:var(--bg);padding:22px 0;position:relative;z-index:1;
+}
+.payment-label{
+  text-align:center;font-size:11px;font-weight:600;
+  color:var(--fg3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:16px;
+}
+.slider-outer{overflow:hidden;position:relative;direction:ltr}
+.slider-outer::before,.slider-outer::after{
+  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
+}
+.slider-outer::before{left:0;background:linear-gradient(to right,var(--bg),transparent)}
+.slider-outer::after{right:0;background:linear-gradient(to left,var(--bg),transparent)}
+
+/* Seamless: items use padding (not gap) so loop edge matches */
+.slider-track{
+  display:flex;align-items:center;width:max-content;
+  will-change:transform;
+}
+.pay-item{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  flex-shrink:0;width:130px;
+}
+.pay-logo{
+  height:32px;display:flex;align-items:center;justify-content:center;
+  opacity:0.88;transition:opacity .2s;
+}
+.pay-logo img{height:30px;object-fit:contain;max-width:96px}
+.pay-item:hover .pay-logo{opacity:1}
+.pay-name{font-size:10px;font-weight:600;color:var(--fg3);letter-spacing:.3px;white-space:nowrap}
+
+/* ── HERO ── */
+.hero{
+  min-height:calc(90vh - 70px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px 40px;position:relative;z-index:1;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--fg2);padding:6px 16px;border-radius:50px;
+  font-size:12px;font-weight:600;margin-bottom:28px;letter-spacing:.3px;
+}
+.hero-badge svg{width:13px;height:13px;stroke:var(--teal);fill:none;stroke-width:2}
+.hero h1{
+  font-size:clamp(2.8rem,8vw,5.2rem);font-weight:700;line-height:1.06;
+  margin-bottom:10px;color:var(--fg);letter-spacing:-2px;
+}
+.hero h1 em{font-style:normal;color:var(--fg3)}
+.hero-sub{
+  font-size:clamp(1rem,2.5vw,1.15rem);color:var(--fg2);font-weight:400;
+  margin-bottom:38px;line-height:1.75;max-width:480px;margin-left:auto;margin-right:auto;
+}
+.hero-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+.btn-hero-primary{
+  padding:14px 32px;border-radius:50px;
+  font-family:'GraphikArabic','Noto Naskh Arabic',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  background:var(--fg);color:var(--bg);border:none;transition:opacity .2s,transform .2s;
+}
+.btn-hero-primary:hover{opacity:.85;transform:translateY(-2px)}
+.btn-hero-primary svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5}
+.btn-hero-secondary{
+  padding:14px 32px;border-radius:50px;
+  font-family:'GraphikArabic','Noto Naskh Arabic',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--fg);border:1px solid var(--border);transition:background .2s;
+}
+.btn-hero-secondary:hover{background:var(--bg2)}
+
+/* ── FEATURES ── */
+.features{padding:96px 24px;max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.sec-header{text-align:center;margin-bottom:56px}
+.sec-header h2{font-size:clamp(1.9rem,4vw,2.9rem);font-weight:700;letter-spacing:-1px;margin-bottom:12px;color:var(--fg)}
+.sec-header p{color:var(--fg3);font-size:.95rem;font-weight:400}
+.feat-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1px;border:1px solid var(--border);border-radius:20px;overflow:hidden;background:var(--border);
+}
+.feat-item{padding:32px 28px;background:var(--bg);transition:background .2s}
+.feat-item:hover{background:var(--bg2)}
+.feat-num{font-size:11px;font-weight:700;color:var(--fg3);letter-spacing:1px;margin-bottom:16px}
+.feat-icon{
+  width:42px;height:42px;border-radius:12px;
+  background:linear-gradient(135deg,rgba(0,169,157,.1),rgba(0,122,114,.1));
+  border:1px solid rgba(0,169,157,.15);
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--teal);
+}
+.feat-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.feat-item h3{font-size:1rem;font-weight:600;margin-bottom:8px;color:var(--fg)}
+.feat-item p{color:var(--fg3);font-size:.88rem;line-height:1.65;font-weight:400}
+
+/* ── CTA ── */
+.cta-section{padding:96px 24px;text-align:center;position:relative;z-index:1}
+.cta-box{
+  max-width:520px;margin:0 auto;border:1px solid var(--border);border-radius:24px;
+  padding:52px 36px;background:var(--bg2);
+}
+.cta-box h2{font-size:2rem;font-weight:700;letter-spacing:-0.8px;margin-bottom:14px;color:var(--fg)}
+.cta-box p{color:var(--fg3);margin-bottom:30px;font-size:.95rem;line-height:1.7}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);padding:26px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  color:var(--fg3);font-size:13px;position:relative;z-index:1;
+}
+footer a{color:var(--fg3);text-decoration:none;transition:color .2s}
+footer a:hover{color:var(--fg)}
+
+[data-lang="en"]{direction:ltr}
+[data-lang="ku"]{direction:rtl}
+
+@media(max-width:600px){
+  nav{padding:0 16px}
+  .logo-name{display:none}
+  .hero{padding:48px 16px 32px}
+  .hero h1{letter-spacing:-1px}
+  footer{flex-direction:column;gap:8px;text-align:center}
+  .cta-box{padding:36px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo-wrap">
+    <img src="kozhen-logo.png" alt="Kozhen Studio" class="logo-img">
+    <span class="logo-name">Kozhen Studio</span>
+  </a>
+  <div class="nav-right">
+    <button class="lang-btn" onclick="cycleLang()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span id="langLabel">EN</span>
+    </button>
+    <a href="/login" class="btn-icon-nav" title="تسجيل الدخول">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+    </a>
+    <a href="/register" class="btn-icon-nav btn-icon-solid" title="إنشاء حساب">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge">
+    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span id="hero-badge">ستوديو الرقمي #1</span>
+  </div>
+  <h1 id="hero-title">حلول رقمية<br><em>لعملك</em></h1>
+  <p class="hero-sub" id="hero-sub">أنشئ منيو احترافياً لمطعمك في دقائق، اختر ثيمك المفضل، وابدأ باستقبال الطلبات فوراً</p>
+  <div class="hero-cta">
+    <a href="/register" class="btn-hero-primary">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <span id="cta-primary-text">ابدأ مجاناً</span>
+    </a>
+    <a href="/login" class="btn-hero-secondary">
+      <span id="cta-secondary-text">تسجيل الدخول</span>
+    </a>
+  </div>
+</section>
+
+<!-- ── PAYMENT SLIDER ── -->
+<div class="payment-section">
+  <p class="payment-label" id="pay-label">وسائل الدفع المدعومة</p>
+  <div class="slider-outer">
+    <div class="slider-track" id="sliderTrack">
+      <div class="pay-item"><div class="pay-logo"><img src="pay-fastpay.svg" alt="FastPay"></div><span class="pay-name">FastPay</span></div>
+      <div class="pay-item"><div class="pay-logo"><img src="pay-fib.svg" alt="FIB"></div><span class="pay-name">FIB</span></div>
+      <div class="pay-item"><div class="pay-logo"><img src="pay-mastercard.svg" alt="Mastercard"></div><span class="pay-name">Mastercard</span></div>
+      <div class="pay-item"><div class="pay-logo"><img src="pay-cash.svg" alt="Cash"></div><span class="pay-name">Cash</span></div>
+      <div class="pay-item"><div class="pay-logo"><img src="pay-zain.svg" alt="Zain Cash"></div><span class="pay-name">Zain Cash</span></div>
+      <div class="pay-item">
+        <div class="pay-logo"><svg width="52" height="30" viewBox="0 0 52 30" fill="none"><rect width="52" height="30" rx="4" fill="#1A1F71"/><text x="26" y="21" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#FFFFFF">VISA</text></svg></div>
+        <span class="pay-name">Visa</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURES ── -->
+<section class="features">
+  <div class="sec-header">
+    <h2 id="feat-title">كل ما تحتاجه لمطعمك</h2>
+    <p id="feat-sub">منصة متكاملة بدون تعقيد</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-item">
+      <div class="feat-num">01</div>
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+      <h3 id="f1-title">٥ ثيمات احترافية</h3>
+      <p id="f1-desc">اختر من بين ثيمات مصممة بعناية لكل نوع من المطاعم</p>
+    </div>
+    <div class="feat-item">
+      <div class="feat-num">02</div>
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+      <h3 id="f2-title">رابط مخصص لمطعمك</h3>
+      <p id="f2-desc">احصل على رابط قصير وسهل يشاركه زبائنك في الواتساب</p>
+    </div>
+    <div class="feat-item">
+      <div class="feat-num">03</div>
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+      <h3 id="f3-title">إدارة المنتجات</h3>
+      <p id="f3-desc">أضف وعدّل وحذف المنتجات من لوحة تحكم بسيطة</p>
+    </div>
+    <div class="feat-item">
+      <div class="feat-num">04</div>
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+      <h3 id="f4-title">تصميم للجوال أولاً</h3>
+      <p id="f4-desc">منيوك يظهر بشكل مثالي على كل الأجهزة</p>
+    </div>
+    <div class="feat-item">
+      <div class="feat-num">05</div>
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+      <h3 id="f5-title">شهر تجريبي مجاني</h3>
+      <p id="f5-desc">ابدأ بدون بطاقة ائتمان وجرّب كل الميزات</p>
+    </div>
+    <div class="feat-item">
+      <div class="feat-num">06</div>
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <h3 id="f6-title">إحصائيات مباشرة</h3>
+      <p id="f6-desc">تابع عدد زيارات منيوك وأكثر الأطباق مشاهدة</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+  <div class="cta-box">
+    <h2 id="cta-title">جاهز لبدء مطعمك الرقمي؟</h2>
+    <p id="cta-desc">انضم لآلاف المطاعم التي تستخدم Kozhen Studio يومياً</p>
+    <a href="/register" class="btn-hero-primary" style="display:inline-flex;margin:0 auto">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <span id="cta-btn-text">ابدأ الآن مجاناً</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <span>© 2025 Kozhen Studio</span>
+  <span id="footer-copy">جميع الحقوق محفوظة</span>
+</footer>
+
+<script>
+const html = document.documentElement;
+const langs = ['ar','en'];
+let lang = localStorage.getItem('kz_lang') || 'ar';
+
+const t = {
+  ar: {
+    dir:'rtl', htmlLang:'ar', langLabel:'EN',
+    'nav-login':'تسجيل الدخول','nav-register':'ابدأ مجاناً',
+    'hero-badge':'ستوديو الرقمي #1',
+    'hero-title':'حلول رقمية<br><em>لعملك</em>',
+    'hero-sub':'أنشئ منيو احترافياً لمطعمك في دقائق، اختر ثيمك المفضل، وابدأ باستقبال الطلبات فوراً',
+    'cta-primary-text':'ابدأ مجاناً','cta-secondary-text':'تسجيل الدخول',
+    'pay-label':'وسائل الدفع المدعومة',
+    'feat-title':'كل ما تحتاجه لمطعمك','feat-sub':'منصة متكاملة بدون تعقيد',
+    'f1-title':'٥ ثيمات احترافية','f1-desc':'اختر من بين ثيمات مصممة بعناية لكل نوع من المطاعم',
+    'f2-title':'رابط مخصص لمطعمك','f2-desc':'احصل على رابط قصير وسهل يشاركه زبائنك في الواتساب',
+    'f3-title':'إدارة المنتجات','f3-desc':'أضف وعدّل وحذف المنتجات من لوحة تحكم بسيطة',
+    'f4-title':'تصميم للجوال أولاً','f4-desc':'منيوك يظهر بشكل مثالي على كل الأجهزة',
+    'f5-title':'شهر تجريبي مجاني','f5-desc':'ابدأ بدون بطاقة ائتمان وجرّب كل الميزات',
+    'f6-title':'إحصائيات مباشرة','f6-desc':'تابع عدد زيارات منيوك وأكثر الأطباق مشاهدة',
+    'cta-title':'جاهز لبدء مطعمك الرقمي؟',
+    'cta-desc':'انضم لآلاف المطاعم التي تستخدم Kozhen Studio يومياً',
+    'cta-btn-text':'ابدأ الآن مجاناً','footer-copy':'جميع الحقوق محفوظة',
+  },
+  en: {
+    dir:'ltr', htmlLang:'en', langLabel:'AR',
+    'nav-login':'Sign In','nav-register':'Get Started',
+    'hero-badge':'#1 Digital Studio',
+    'hero-title':'Digital Solutions<br><em>For Your Business</em>',
+    'hero-sub':'Build a professional menu for your restaurant in minutes, pick your favorite theme, and start receiving orders right away.',
+    'cta-primary-text':'Start for Free','cta-secondary-text':'Sign In',
+    'pay-label':'Supported Payment Methods',
+    'feat-title':'Everything You Need','feat-sub':'A complete platform without the complexity',
+    'f1-title':'5 Pro Themes','f1-desc':'Choose from carefully designed themes for every type of restaurant',
+    'f2-title':'Custom Link','f2-desc':'Get a short easy link your customers can share on WhatsApp',
+    'f3-title':'Product Management','f3-desc':'Add, edit and delete products from a simple dashboard',
+    'f4-title':'Mobile First','f4-desc':'Your menu looks perfect on every device',
+    'f5-title':'Free Trial Month','f5-desc':'Start without a credit card and try all features',
+    'f6-title':'Live Statistics','f6-desc':'Track your menu visits and most viewed dishes',
+    'cta-title':'Ready for Your Digital Menu?',
+    'cta-desc':'Join thousands of restaurants using Kozhen Studio every day',
+    'cta-btn-text':'Start Free Now','footer-copy':'All rights reserved',
+  }
+};
+
+function applyLang(l) {
+  const tr = t[l];
+  html.setAttribute('dir', tr.dir);
+  html.setAttribute('lang', tr.htmlLang);
+  html.setAttribute('data-lang', l);
+  document.getElementById('langLabel').textContent = tr.langLabel;
+  Object.keys(tr).forEach(k => {
+    if (k==='dir'||k==='htmlLang'||k==='langLabel') return;
+    const el = document.getElementById(k);
+    if (el) el.innerHTML = tr[k];
+  });
+  localStorage.setItem('kz_lang', l);
+}
+
+function cycleLang() {
+  const idx = langs.indexOf(lang);
+  lang = langs[(idx + 1) % langs.length];
+  applyLang(lang);
+}
+
+applyLang(lang);
+
+// ── Seamless marquee ──────────────────────────────────────
+(function(){
+  const track = document.getElementById('sliderTrack');
+  if (!track) return;
+
+  // Clone all original items and append — JS-side duplication
+  const originals = Array.from(track.children);
+  originals.forEach(function(el){ track.appendChild(el.cloneNode(true)); });
+
+  // Each item has fixed width:130px from CSS — no need to measure
+  const ITEM_W = 130;
+  const setW   = originals.length * ITEM_W;   // e.g. 6 × 130 = 780px
+
+  let pos    = 0;
+  let paused = false;
+  let last   = null;
+  const SPEED = 0.055; // px per ms
+
+  function step(ts) {
+    if (last !== null && !paused) {
+      var delta = Math.min(ts - last, 100); // cap: tab switch fix
+      pos += delta * SPEED;
+      if (pos >= setW) pos -= setW;
+      track.style.transform = 'translateX(-' + pos.toFixed(3) + 'px)';
+    }
+    last = ts;
+    requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+
+  // Reset last when tab becomes visible again
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) last = null;
+  });
+
+  track.addEventListener('mouseenter', function(){ paused = true; });
+  track.addEventListener('mouseleave', function(){ paused = false; last = null; });
+})();
+</script>
+</body>
+</html>
