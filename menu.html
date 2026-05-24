@@ -150,6 +150,11 @@ body.ltr .m-cats{direction:ltr}
 
 <script>
 const ICON_MAP = { utensils:'🍽', coffee:'☕', leaf:'🥗', cookie:'🍪', pizza:'🍕', burger:'🍔', fish:'🐟', chicken:'🍗' };
+function getIcon(icon, size) {
+  if (!icon) return '🍽';
+  if (icon.startsWith('http')) return `<img src="${icon}" style="width:${size||22}px;height:${size||22}px;object-fit:contain;border-radius:3px;vertical-align:middle">`;
+  return ICON_MAP[icon] || icon;
+}
 const LABELS = {
   ar: { menu:'قائمة الطعام', currency:'', empty:'لا يوجد منتجات بعد', powered:'مُشغَّل بواسطة' },
   en: { menu:'Menu', currency:'', empty:'No items yet', powered:'Powered by' }
@@ -272,7 +277,7 @@ function renderMenu({ user, products, categories }, lang) {
 
   const catBtns = catKeys.map(k => {
     const c = catsMap[k] || { name: k, icon: 'utensils', color: '#8b5cf6' };
-    return `<button class="m-cat-btn" onclick="scrollToSection('${k}')">${ICON_MAP[c.icon]||'🍽'} ${esc(c.name)}</button>`;
+    return `<button class="m-cat-btn" onclick="scrollToSection('${k}')">${getIcon(c.icon,18)} ${esc(c.name)}</button>`;
   }).join('');
 
   const sectionsHtml = catKeys.map(k => {
@@ -280,13 +285,13 @@ function renderMenu({ user, products, categories }, lang) {
     const prods = grouped[k] || [];
     return `<div class="m-cat-section" id="cat-${k}">
       <div class="m-cat-title">
-        <div class="m-cat-icon" style="background:${c.color}22">${ICON_MAP[c.icon]||'🍽'}</div>
+        <div class="m-cat-icon" style="background:${c.color}22">${getIcon(c.icon,20)}</div>
         ${esc(c.name)}
       </div>
       <div class="products-grid">${prods.map(p => `<div class="p-card">
         ${p.image_url
           ? `<div class="p-card-img-wrap"><img class="p-card-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy"></div>`
-          : `<div class="p-card-img-placeholder">${ICON_MAP[catsMap[p.category]?.icon]||'🍽'}</div>`}
+          : `<div class="p-card-img-placeholder">${getIcon(catsMap[p.category]?.icon,28)}</div>`}
         <div class="p-card-body">
           <div class="p-card-name">${esc(p.name)}</div>
           ${p.description ? `<div class="p-card-desc">${esc(p.description)}</div>` : ''}

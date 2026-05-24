@@ -119,6 +119,29 @@ body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color
 .upload-box:hover{border-color:#555}
 .upload-box.uploading{opacity:.6;pointer-events:none}
 .upload-progress{font-size:12px;color:var(--fg3);text-align:center;padding:10px;display:none}
+/* ── ICON PICKER ── */
+.icon-picker-wrap{position:relative}
+.icon-selected-btn{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 14px;cursor:pointer;transition:border-color .2s;user-select:none}
+.icon-selected-btn:hover{border-color:#444}
+.icon-selected-preview{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.icon-selected-preview img{width:28px;height:28px;object-fit:contain;border-radius:4px}
+.icon-selected-label{flex:1;font-size:13px;color:var(--fg2)}
+.icon-selected-btn svg{width:14px;height:14px;stroke:var(--fg3);fill:none;stroke-width:2;transition:transform .2s;flex-shrink:0}
+.icon-selected-btn.open svg{transform:rotate(180deg)}
+.icon-panel{position:absolute;top:calc(100% + 6px);right:0;left:0;background:#161616;border:1px solid var(--border);border-radius:14px;z-index:300;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;display:none}
+.icon-panel.open{display:block}
+.icon-panel-upload{padding:10px 12px;border-bottom:1px solid var(--border)}
+.icon-upload-label{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px dashed var(--border2);border-radius:9px;padding:9px 14px;cursor:pointer;color:var(--fg2);font-size:13px;font-weight:600;transition:border-color .2s}
+.icon-upload-label:hover{border-color:#555;color:var(--fg)}
+.icon-upload-label svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.icon-panel-tabs{display:flex;gap:0;padding:8px 12px 0;border-bottom:1px solid var(--border)}
+.icon-tab{padding:6px 12px;font-size:12px;font-weight:600;color:var(--fg3);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+.icon-tab.active{color:var(--fg);border-bottom-color:var(--red)}
+.icon-grid-wrap{padding:10px 12px;max-height:200px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:4px}
+.icon-opt{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:22px;border-radius:8px;cursor:pointer;transition:background .15s;border:2px solid transparent}
+.icon-opt:hover{background:var(--bg2)}
+.icon-opt.active{background:var(--red-dim);border-color:var(--red-border)}
 </style>
 </head>
 <body>
@@ -240,19 +263,35 @@ body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color
         <div class="form-grid">
           <div class="form-group"><label>اسم الفئة</label><input type="text" id="cName" placeholder="المشروبات الساخنة"></div>
           <div class="form-group"><label>المعرف (إنجليزي)</label><input type="text" id="cSlug" placeholder="hot_drinks"></div>
-          <div class="form-group"><label>أيقونة</label>
-            <select id="cIcon">
-              <option value="utensils">🍽 أطباق</option>
-              <option value="coffee">☕ قهوة</option>
-              <option value="leaf">🥗 خضار</option>
-              <option value="cookie">🍪 حلويات</option>
-              <option value="pizza">🍕 بيتزا</option>
-              <option value="burger">🍔 برغر</option>
-              <option value="fish">🐟 مأكولات بحرية</option>
-              <option value="chicken">🍗 دجاج</option>
-            </select>
-          </div>
           <div class="form-group"><label>اللون</label><input type="color" id="cColor" value="#8b5cf6" style="height:42px"></div>
+          <div class="form-group form-full"><label>أيقونة القسم</label>
+            <div class="icon-picker-wrap">
+              <div class="icon-selected-btn" id="iconSelectedBtn" onclick="toggleIconPicker()">
+                <div class="icon-selected-preview" id="iconSelectedPreview">🍽</div>
+                <span class="icon-selected-label">اضغط لاختيار أيقونة</span>
+                <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="icon-panel" id="iconPanel">
+                <div class="icon-panel-upload">
+                  <label class="icon-upload-label">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    رفع أيقونة مخصصة (PNG / SVG)
+                    <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none" onchange="handleCatIconUpload(this)">
+                  </label>
+                </div>
+                <div class="icon-panel-tabs">
+                  <span class="icon-tab active" onclick="switchIconTab('food',this)">طعام</span>
+                  <span class="icon-tab" onclick="switchIconTab('drinks',this)">مشروبات</span>
+                  <span class="icon-tab" onclick="switchIconTab('desserts',this)">حلويات</span>
+                  <span class="icon-tab" onclick="switchIconTab('other',this)">أخرى</span>
+                </div>
+                <div class="icon-grid-wrap">
+                  <div class="icon-grid" id="iconGrid"></div>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="cIcon" value="🍽">
+          </div>
         </div>
         <button class="btn-add" onclick="addCategory()" style="margin-top:14px">
           <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -337,7 +376,23 @@ const THEMES = [
   { id: 'cafe', name: 'Cafe Style', preview: { bg: '#2c1810', fg: '#d4a373' } },
 ];
 
-const ICON_MAP = { utensils: '🍽', coffee: '☕', leaf: '🥗', cookie: '🍪', pizza: '🍕', burger: '🍔', fish: '🐟', chicken: '🍗' };
+const ICON_MAP = { utensils:'🍽', coffee:'☕', leaf:'🥗', cookie:'🍪', pizza:'🍕', burger:'🍔', fish:'🐟', chicken:'🍗' };
+const ICON_TABS = {
+  food:     ['🍽','🍖','🥩','🍗','🥓','🍔','🍟','🌮','🌯','🥙','🧆','🥚','🍳','🥘','🫕','🍲','🍱','🍜','🍝','🍛','🍚','🍙','🥗','🫔','🥪','🥫','🧇','🥞','🍞','🥐','🥖','🫓','🧀'],
+  drinks:   ['☕','🫖','🍵','🧃','🥤','🧋','🍺','🍻','🥂','🍷','🍸','🍹','🧉','🥛','🍼','🫗','🧊','🍶'],
+  desserts: ['🍰','🎂','🧁','🍮','🍭','🍬','🍫','🍿','🍦','🍨','🍧','🍩','🍪','🥧','🍡','🍢','🍣','🥮','🍯'],
+  other:    ['🛒','🫙','🧂','🥢','🍴','🥄','🔪','⭐','❤️','🔥','✨','💯','🏆','🎯','🌟','🍀','🌿','🌾','🫚','🫛']
+};
+function getIconDisplay(icon) {
+  if (!icon) return '🍽';
+  if (icon.startsWith('http')) return `<img src="${icon}" style="width:24px;height:24px;object-fit:contain;border-radius:4px">`;
+  return ICON_MAP[icon] || icon;
+}
+function getIconDisplayLarge(icon) {
+  if (!icon) return '🍽';
+  if (icon.startsWith('http')) return `<img src="${icon}" style="width:28px;height:28px;object-fit:contain;border-radius:4px">`;
+  return ICON_MAP[icon] || icon;
+}
 
 async function init() {
   const res = await API.get('/user');
@@ -386,7 +441,7 @@ async function loadCats() {
 
 function updateCatSelect() {
   const sel = document.getElementById('pCat');
-  sel.innerHTML = appCats.map(c => `<option value="${c.slug}">${ICON_MAP[c.icon] || '🍽'} ${c.name}</option>`).join('');
+  sel.innerHTML = appCats.map(c => `<option value="${c.slug}">${c.icon?.startsWith('http') ? '📷' : (ICON_MAP[c.icon] || c.icon || '🍽')} ${c.name}</option>`).join('');
 }
 
 function renderProducts() {
@@ -399,7 +454,7 @@ function renderProducts() {
       <div class="product-info">
         <div class="product-name">${esc(p.name)}</div>
         ${p.description ? `<div class="product-desc">${esc(p.description)}</div>` : ''}
-        ${cat ? `<span class="product-cat">${ICON_MAP[cat.icon]||'🍽'} ${esc(cat.name)}</span>` : ''}
+        ${cat ? `<span class="product-cat">${getIconDisplay(cat.icon)} ${esc(cat.name)}</span>` : ''}
       </div>
       <div style="text-align:left">
         <div class="product-price">${parseFloat(p.price).toFixed(2)}</div>
@@ -420,7 +475,7 @@ function renderCats() {
   const el = document.getElementById('catsList');
   if (!appCats.length) { el.innerHTML = '<div class="empty">لا يوجد فئات</div>'; return; }
   el.innerHTML = appCats.map(c => `<div class="cat-card">
-    <div class="cat-icon" style="background:${c.color}22;border:1px solid ${c.color}44">${ICON_MAP[c.icon]||'🍽'}</div>
+    <div class="cat-icon" style="background:${c.color}22;border:1px solid ${c.color}44">${getIconDisplayLarge(c.icon)}</div>
     <div class="cat-info"><div class="cat-name">${esc(c.name)}</div><div class="cat-slug">${c.slug}</div></div>
     <button class="icon-btn danger" onclick="deleteCategory(${c.id})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
   </div>`).join('');
@@ -612,6 +667,75 @@ function doLogout() {
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ── ICON PICKER ──
+let iconPickerOpen = false;
+let currentIconTab = 'food';
+
+function renderIconGrid(tab) {
+  const current = document.getElementById('cIcon').value;
+  const grid = document.getElementById('iconGrid');
+  grid.innerHTML = (ICON_TABS[tab] || ICON_TABS.food).map(e =>
+    `<div class="icon-opt${current===e?' active':''}" onclick="setCategoryIcon('${e}')">${e}</div>`
+  ).join('');
+}
+
+function toggleIconPicker() {
+  const btn = document.getElementById('iconSelectedBtn');
+  const panel = document.getElementById('iconPanel');
+  iconPickerOpen = !iconPickerOpen;
+  btn.classList.toggle('open', iconPickerOpen);
+  panel.classList.toggle('open', iconPickerOpen);
+  if (iconPickerOpen) renderIconGrid(currentIconTab);
+}
+
+function switchIconTab(tab, el) {
+  currentIconTab = tab;
+  document.querySelectorAll('.icon-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderIconGrid(tab);
+}
+
+function setCategoryIcon(icon) {
+  document.getElementById('cIcon').value = icon;
+  const preview = document.getElementById('iconSelectedPreview');
+  if (icon.startsWith('http')) {
+    preview.innerHTML = `<img src="${icon}" style="width:28px;height:28px;object-fit:contain;border-radius:4px">`;
+  } else {
+    preview.textContent = icon;
+  }
+  document.getElementById('iconSelectedBtn').classList.remove('open');
+  document.getElementById('iconPanel').classList.remove('open');
+  iconPickerOpen = false;
+  renderIconGrid(currentIconTab);
+}
+
+async function handleCatIconUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast('الحد الأقصى 2MB', 'error'); return; }
+  const label = input.closest('.icon-upload-label');
+  label.style.opacity = '.5';
+  label.style.pointerEvents = 'none';
+  try {
+    const url = await uploadFile(file);
+    setCategoryIcon(url);
+    showToast('تم رفع الأيقونة ✓');
+  } catch(err) {
+    showToast(err.message || 'فشل الرفع', 'error');
+  } finally {
+    label.style.opacity = '';
+    label.style.pointerEvents = '';
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (iconPickerOpen && !e.target.closest('.icon-picker-wrap')) {
+    document.getElementById('iconSelectedBtn').classList.remove('open');
+    document.getElementById('iconPanel').classList.remove('open');
+    iconPickerOpen = false;
+  }
+});
 
 // ── UPLOAD HELPERS ──
 async function uploadFile(file) {
