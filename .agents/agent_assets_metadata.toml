@@ -1,3 +1,8 @@
 uploads = []
 generated = []
-outputs = []
+
+[[outputs]]
+id = "RCleylovRvdwRXrfA-Trt"
+uri = "file://kozhen-studio-netlify.zip"
+type = "unspecified"
+title = "kozhen-studio-netlify.zip (نظيف - بدون esbuild)"

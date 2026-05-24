@@ -1,0 +1,34 @@
+Relevant log line: line 8 shows the failure: "Failing build: Failed to parse configuration". Lines 6–7 show the repo was cloned successfully, so the problem is Netlify parsing your configuration, not cloning.
+Diagnosis
+
+Error type: Netlify configuration parse error (Netlify failed to parse netlify.toml or other site configuration).
+Likely cause: A malformed or misplaced netlify.toml (syntax/TOML error or file not in repo root), or an invalid config committed to the repo root that Netlify cannot parse.
+Solution — steps to identify and fix
+
+Verify the config file is present and committed at the repo root
+Check that netlify.toml exists in the repository root and is committed:
+Locally: git ls-files | grep netlify.toml
+Or check the repo: https://github.com/mouhemmad/Muhamad/blob/main/netlify.toml
+If the file is missing but you expect Netlify to use a config file, either add a valid netlify.toml to the repo root or remove site-level Netlify settings that point to a config file.
+Validate/fix netlify.toml syntax
+Common TOML mistakes: missing quotes, wrong table/array syntax, stray commas, or invalid types.
+Example minimal valid netlify.toml:
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+If you have more complex entries (plugins, functions, headers, environment variables), confirm they follow TOML rules and Netlify's schema: https://docs.netlify.com/configure-builds/file-based-configuration/
+How to validate locally
+Quick manual checks: open netlify.toml in an editor with TOML syntax highlighting (VS Code + TOML extension).
+Use the Netlify CLI to get more detailed errors:
+Install: npm i -g netlify-cli
+Run: netlify build
+The CLI will report parse errors with line numbers.
+Alternatively, use an online TOML validator or a small parser script (install a toml parser npm package and attempt to parse the file).
+Commit and redeploy
+After fixing the TOML, commit and push the changes. Netlify should be able to parse the corrected file and proceed with the build.
+If after these steps the problem persists, paste the contents of your netlify.toml (or the site-level build configuration you use) and I’ll point out the exact syntax error and line to fix.
