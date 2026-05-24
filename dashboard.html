@@ -115,6 +115,10 @@ body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color
 .badge-red{background:var(--red-dim);border:1px solid var(--red-border);color:var(--red)}
 .loading{color:var(--fg3);font-size:14px;padding:40px;text-align:center}
 .empty{color:var(--fg3);font-size:14px;padding:40px;text-align:center;border:1px dashed var(--border);border-radius:14px}
+.upload-box{background:var(--bg3);border:1.5px dashed var(--border2);border-radius:12px;cursor:pointer;transition:border-color .2s;overflow:hidden;min-height:50px;display:flex;align-items:center;justify-content:center}
+.upload-box:hover{border-color:#555}
+.upload-box.uploading{opacity:.6;pointer-events:none}
+.upload-progress{font-size:12px;color:var(--fg3);text-align:center;padding:10px;display:none}
 </style>
 </head>
 <body>
@@ -205,7 +209,17 @@ body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color
           <div class="form-group"><label>السعر</label><input type="number" id="pPrice" placeholder="12.99" step="0.01" min="0"></div>
           <div class="form-group form-full"><label>الوصف</label><textarea id="pDesc" placeholder="وصف المنتج (اختياري)"></textarea></div>
           <div class="form-group"><label>الفئة</label><select id="pCat"></select></div>
-          <div class="form-group"><label>رابط الصورة (اختياري)</label><input type="url" id="pImg" placeholder="https://..."></div>
+          <div class="form-group"><label>صورة المنتج</label>
+            <div class="upload-box" id="pImgBox" onclick="document.getElementById('pImgFile').click()">
+              <img id="pImgPreview" style="display:none;width:100%;height:80px;object-fit:cover;border-radius:8px">
+              <div id="pImgPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--fg3);font-size:12px;padding:14px 0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                اختر صورة
+              </div>
+            </div>
+            <input type="file" id="pImgFile" accept="image/*" style="display:none" onchange="handleImgSelect(this,'pImgPreview','pImgPlaceholder','pImg')">
+            <input type="hidden" id="pImg">
+          </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:14px">
           <button class="btn-add" onclick="saveProduct()">
@@ -269,8 +283,30 @@ body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color
           <div class="form-group"><label>سناب شات</label><input type="text" id="profSnapchat" placeholder="@username"></div>
           <div class="form-group"><label>فيسبوك</label><input type="text" id="profFacebook" placeholder="رابط الصفحة"></div>
           <div class="form-group"><label>الموقع (خرائط)</label><input type="url" id="profLocation" placeholder="رابط Google Maps"></div>
-          <div class="form-group form-full"><label>رابط فيديو تعريفي</label><input type="url" id="profVideo" placeholder="رابط يوتيوب أو تيك توك"></div>
-          <div class="form-group form-full"><label>صورة الغلاف (رابط)</label><input type="url" id="profHero" placeholder="https://..."></div>
+          <div class="form-group form-full">
+            <label>فيديو تعريفي</label>
+            <div class="upload-box" id="profVideoBox" onclick="document.getElementById('profVideoFile').click()">
+              <video id="profVideoPreview" style="display:none;width:100%;height:90px;object-fit:cover;border-radius:8px" muted></video>
+              <div id="profVideoPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--fg3);font-size:12px;padding:14px 0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                اختر فيديو (max 50MB)
+              </div>
+            </div>
+            <input type="file" id="profVideoFile" accept="video/*" style="display:none" onchange="handleVideoSelect(this)">
+            <input type="hidden" id="profVideo">
+          </div>
+          <div class="form-group form-full">
+            <label>صورة الغلاف</label>
+            <div class="upload-box" id="profHeroBox" onclick="document.getElementById('profHeroFile').click()">
+              <img id="profHeroPreview" style="display:none;width:100%;height:90px;object-fit:cover;border-radius:8px">
+              <div id="profHeroPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--fg3);font-size:12px;padding:14px 0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                اختر صورة غلاف
+              </div>
+            </div>
+            <input type="file" id="profHeroFile" accept="image/*" style="display:none" onchange="handleImgSelect(this,'profHeroPreview','profHeroPlaceholder','profHero')">
+            <input type="hidden" id="profHero">
+          </div>
         </div>
         <button class="btn-add" onclick="saveProfile()" style="margin-top:14px">
           <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -431,6 +467,17 @@ function populateProfileForm() {
   document.getElementById('profLocation').value = appUser.social_location || '';
   document.getElementById('profVideo').value = appUser.video_url || '';
   document.getElementById('profHero').value = appUser.hero_image || '';
+  // Show existing previews
+  if (appUser.hero_image) {
+    const img = document.getElementById('profHeroPreview');
+    img.src = appUser.hero_image; img.style.display = 'block';
+    document.getElementById('profHeroPlaceholder').style.display = 'none';
+  }
+  if (appUser.video_url) {
+    const vid = document.getElementById('profVideoPreview');
+    vid.src = appUser.video_url; vid.style.display = 'block';
+    document.getElementById('profVideoPlaceholder').style.display = 'none';
+  }
 }
 
 async function saveProduct() {
@@ -464,6 +511,11 @@ function editProduct(id) {
   document.getElementById('pDesc').value = p.description || '';
   document.getElementById('pCat').value = p.category;
   document.getElementById('pImg').value = p.image_url || '';
+  if (p.image_url) {
+    const prev = document.getElementById('pImgPreview');
+    prev.src = p.image_url; prev.style.display = 'block';
+    document.getElementById('pImgPlaceholder').style.display = 'none';
+  }
   document.getElementById('productFormTitle').textContent = 'تعديل المنتج';
   document.getElementById('productBtnText').textContent = 'حفظ التعديل';
   document.getElementById('cancelEditBtn').style.display = 'inline-flex';
@@ -476,6 +528,10 @@ function cancelEdit() {
   document.getElementById('pPrice').value = '';
   document.getElementById('pDesc').value = '';
   document.getElementById('pImg').value = '';
+  const prev = document.getElementById('pImgPreview');
+  prev.style.display = 'none'; prev.src = '';
+  document.getElementById('pImgPlaceholder').style.display = 'flex';
+  document.getElementById('pImgFile').value = '';
   document.getElementById('productFormTitle').textContent = 'إضافة منتج جديد';
   document.getElementById('productBtnText').textContent = 'إضافة';
   document.getElementById('cancelEditBtn').style.display = 'none';
@@ -555,6 +611,67 @@ function doLogout() {
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── UPLOAD HELPERS ──
+async function uploadFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const res = await API.post('/upload', { file: e.target.result, filename: file.name });
+        if (res && res.ok) resolve(res.data.url);
+        else reject(new Error(res?.data?.error || 'فشل الرفع'));
+      } catch(err) { reject(err); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleImgSelect(input, previewId, placeholderId, hiddenId) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('الحد الأقصى للصورة 5MB', 'error'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById(previewId);
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById(placeholderId).style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+  const box = input.closest('.form-group').querySelector('.upload-box');
+  if (box) {
+    box.classList.add('uploading');
+    uploadFile(file).then(url => {
+      document.getElementById(hiddenId).value = url;
+      box.classList.remove('uploading');
+      showToast('تم رفع الصورة ✓');
+    }).catch(err => {
+      box.classList.remove('uploading');
+      showToast(err.message || 'فشل الرفع', 'error');
+    });
+  }
+}
+
+function handleVideoSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 50 * 1024 * 1024) { showToast('الحد الأقصى للفيديو 50MB', 'error'); input.value = ''; return; }
+  const objectUrl = URL.createObjectURL(file);
+  const vid = document.getElementById('profVideoPreview');
+  vid.src = objectUrl; vid.style.display = 'block';
+  document.getElementById('profVideoPlaceholder').style.display = 'none';
+  const box = input.closest('.form-group').querySelector('.upload-box');
+  box.classList.add('uploading');
+  uploadFile(file).then(url => {
+    document.getElementById('profVideo').value = url;
+    box.classList.remove('uploading');
+    showToast('تم رفع الفيديو ✓');
+  }).catch(err => {
+    box.classList.remove('uploading');
+    showToast(err.message || 'فشل رفع الفيديو', 'error');
+  });
 }
 
 init();
