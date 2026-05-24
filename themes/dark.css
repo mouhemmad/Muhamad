@@ -1,0 +1,6 @@
+body { background: #1a1a2e; color: #eee; }
+.restaurant-header { background: linear-gradient(135deg, #16213e, #0f3460); }
+.product-card { background: #16213e; color: #eee; }
+.product-name { color: #e94560; }
+.product-price { color: #0f3460; }
+.category-title { color: #e94560; border-color: #e94560; }

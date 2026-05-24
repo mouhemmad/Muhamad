@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة المدير — Kozhen Studio</title>
+<style>
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_Light.woff2') format('woff2');font-weight:300}
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_Medium.woff2') format('woff2');font-weight:500}
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_SemiBold.woff2') format('woff2');font-weight:600}
+@font-face{font-family:'GraphikArabic';src:url('Graphik_Arabic_Bold.woff2') format('woff2');font-weight:700}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--fg:#f5f5f5;--fg2:#aaa;--fg3:#555;--border:#222;--red:#ED1C24;--red-dim:#1a0001;--red-border:#3a0002;--green:#22c55e;--yellow:#f59e0b}
+body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
+/* Login Screen */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#111;border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:380px}
+.login-card h2{font-size:1.3rem;font-weight:700;margin-bottom:6px;text-align:center}
+.login-card p{color:var(--fg3);font-size:13px;text-align:center;margin-bottom:24px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--fg3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
+.form-group input{width:100%;background:#0d0d0d;border:1px solid var(--border);color:var(--fg);padding:12px 14px;border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.form-group input:focus{border-color:#444}
+.btn-full{width:100%;background:var(--red);color:#fff;border:none;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.btn-full:hover{opacity:.85}
+.err{color:#f87171;font-size:13px;text-align:center;margin-top:12px;display:none}
+/* Admin Panel */
+.admin-screen{display:none}
+.topbar{background:rgba(10,10,10,.95);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100}
+.topbar-title{font-size:15px;font-weight:700}
+.t-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--fg2);font-family:inherit;transition:.15s}
+.t-btn:hover{color:var(--fg);border-color:#444}
+.content{padding:24px 20px;max-width:1100px;margin:0 auto}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
+.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center}
+.stat-val{font-size:2rem;font-weight:700}
+.stat-lbl{font-size:12px;color:var(--fg3);margin-top:4px}
+.section-head{font-size:1rem;font-weight:700;margin-bottom:14px;color:var(--fg)}
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:28px}
+table{width:100%;border-collapse:collapse}
+th{padding:12px 16px;text-align:right;font-size:11px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);background:var(--bg3)}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border);color:var(--fg2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green)}
+.badge-yellow{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--yellow)}
+.badge-red{background:var(--red-dim);border:1px solid var(--red-border);color:var(--red)}
+.badge-gray{background:var(--bg3);border:1px solid var(--border);color:var(--fg3)}
+.action-btn{padding:5px 12px;border-radius:7px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .2s;margin-left:4px}
+.action-btn-green{background:rgba(34,197,94,.15);color:var(--green)}
+.action-btn-red{background:var(--red-dim);color:var(--red)}
+.action-btn:hover{opacity:.8}
+.loading{color:var(--fg3);font-size:14px;padding:30px;text-align:center}
+@media(max-width:600px){th:nth-child(3),td:nth-child(3){display:none}}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <h2>لوحة المدير</h2>
+    <p>Kozhen Studio Admin Panel</p>
+    <div class="form-group"><label>اسم المستخدم</label><input type="text" id="adminUser" placeholder="admin"></div>
+    <div class="form-group"><label>كلمة المرور</label><input type="password" id="adminPass" placeholder="••••••••"></div>
+    <button class="btn-full" onclick="adminLogin()">دخول</button>
+    <div class="err" id="loginErr">بيانات غير صحيحة</div>
+  </div>
+</div>
+
+<div class="admin-screen" id="adminScreen">
+  <div class="topbar">
+    <div class="topbar-title">🛡 لوحة المدير</div>
+    <button class="t-btn" onclick="adminLogout()">خروج</button>
+  </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-val" id="statTotalUsers">—</div><div class="stat-lbl">مستخدم</div></div>
+      <div class="stat-box"><div class="stat-val" id="statTrialUsers">—</div><div class="stat-lbl">تجريبي</div></div>
+      <div class="stat-box"><div class="stat-val" id="statPaidUsers">—</div><div class="stat-lbl">مدفوع</div></div>
+      <div class="stat-box"><div class="stat-val" id="statTotalProducts">—</div><div class="stat-lbl">منتج</div></div>
+      <div class="stat-box"><div class="stat-val" id="statPending">—</div><div class="stat-lbl">طلبات معلقة</div></div>
+    </div>
+
+    <div class="section-head">المستخدمون</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>المستخدم</th><th>المطعم</th><th>البريد</th><th>الباقة</th><th>ينتهي</th><th>إجراء</th></tr></thead>
+        <tbody id="usersBody"><tr><td colspan="6" class="loading">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+let adminToken = localStorage.getItem('kz_admin_token');
+if (adminToken) showAdmin();
+
+async function adminLogin() {
+  const u = document.getElementById('adminUser').value;
+  const p = document.getElementById('adminPass').value;
+  const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'login', username: u, password: p }) });
+  const data = await res.json();
+  if (res.ok && data.token) {
+    adminToken = data.token;
+    localStorage.setItem('kz_admin_token', adminToken);
+    document.getElementById('loginErr').style.display = 'none';
+    showAdmin();
+    loadAdminData();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+
+function showAdmin() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminScreen').style.display = 'block';
+  loadAdminData();
+}
+
+function adminLogout() {
+  localStorage.removeItem('kz_admin_token');
+  adminToken = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminScreen').style.display = 'none';
+}
+
+async function loadAdminData() {
+  const res = await fetch('/api/admin?action=users', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+  if (res.status === 401) { adminLogout(); return; }
+  const data = await res.json();
+  const { users = [], pending_requests = [], total_products = 0 } = data;
+
+  document.getElementById('statTotalUsers').textContent = users.length;
+  document.getElementById('statTrialUsers').textContent = users.filter(u => u.subscription_status === 'trial').length;
+  document.getElementById('statPaidUsers').textContent = users.filter(u => ['basic','pro'].includes(u.subscription_status)).length;
+  document.getElementById('statTotalProducts').textContent = total_products;
+  document.getElementById('statPending').textContent = pending_requests.length;
+
+  const planNames = { trial: 'تجريبي', basic: 'أساسي', pro: 'احترافي' };
+  const planBadge = { trial: 'badge-yellow', basic: 'badge-green', pro: 'badge-green' };
+
+  const tbody = document.getElementById('usersBody');
+  if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" class="loading">لا يوجد مستخدمون</td></tr>'; return; }
+  tbody.innerHTML = users.map(u => {
+    const end = u.subscription_status === 'trial' ? u.trial_end : u.subscription_end;
+    const isExpired = end && new Date(end) < new Date();
+    return `<tr>
+      <td><strong style="color:#fff">@${esc(u.username)}</strong></td>
+      <td>${esc(u.restaurant_name)}</td>
+      <td style="color:var(--fg3)">${esc(u.email)}</td>
+      <td><span class="badge ${planBadge[u.subscription_status]||'badge-gray'}">${planNames[u.subscription_status]||u.subscription_status}</span></td>
+      <td style="color:${isExpired?'var(--red)':'var(--fg3)'}">${end||'—'}</td>
+      <td>
+        <button class="action-btn action-btn-green" onclick="approveUser(${u.id},'basic',1)">أساسي</button>
+        <button class="action-btn action-btn-green" onclick="approveUser(${u.id},'pro',1)">احترافي</button>
+        <button class="action-btn action-btn-red" onclick="deleteUser(${u.id})">حذف</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function approveUser(uid, plan, months) {
+  if (!confirm(`تفعيل باقة ${plan} للمستخدم؟`)) return;
+  const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken }, body: JSON.stringify({ action: 'approve_subscription', user_id: uid, plan, months }) });
+  const data = await res.json();
+  if (data.success) { showToast('تم تفعيل الاشتراك'); loadAdminData(); }
+  else showToast('خطأ', 'error');
+}
+
+async function deleteUser(uid) {
+  if (!confirm('هل تريد حذف هذا المستخدم نهائياً؟')) return;
+  const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken }, body: JSON.stringify({ action: 'delete_user', user_id: uid }) });
+  const data = await res.json();
+  if (data.success) { showToast('تم الحذف'); loadAdminData(); }
+  else showToast('خطأ', 'error');
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
