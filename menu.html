@@ -14,27 +14,36 @@ img{max-width:100%;display:block}
 body{font-family:'GraphikArabic',sans-serif;min-height:100vh;overflow-x:hidden;background:#0a0a0a}
 
 /* ── SPLASH ── */
-#splashScreen{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .6s ease}
+#splashScreen{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;overflow:hidden;transition:opacity .6s ease}
 #splashScreen.fade-out{opacity:0;pointer-events:none}
 #splashBg{position:absolute;inset:0;background:#111;z-index:0}
 #splashVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
-.splash-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.45) 0%,rgba(0,0,0,.25) 40%,rgba(0,0,0,.75) 100%);z-index:2}
-.splash-content{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;width:100%;padding:24px;padding-bottom:0}
-.splash-name{font-size:2rem;font-weight:700;color:#fff;text-align:center;letter-spacing:-0.5px;text-shadow:0 2px 20px rgba(0,0,0,.5);margin-bottom:32px;opacity:0;transform:translateY(10px);transition:opacity .5s .2s,transform .5s .2s}
+.splash-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.3) 0%,rgba(0,0,0,.1) 35%,rgba(0,0,0,.7) 70%,rgba(0,0,0,.88) 100%);z-index:2}
+/* play button in center */
+.splash-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;backdrop-filter:blur(6px)}
+.splash-play:hover{background:rgba(0,0,0,.7)}
+.splash-play svg{width:26px;height:26px;fill:#fff;margin-left:4px}
+.splash-play.hidden{display:none}
+/* bottom content */
+.splash-content{position:absolute;bottom:0;left:0;right:0;z-index:3;display:flex;flex-direction:column;align-items:center;padding:0 20px 0}
+.splash-name{font-size:1.9rem;font-weight:700;color:#fff;text-align:center;letter-spacing:-0.5px;text-shadow:0 2px 20px rgba(0,0,0,.6);margin-bottom:22px;opacity:0;transform:translateY(12px);transition:opacity .5s .15s,transform .5s .15s}
 .splash-name.show{opacity:1;transform:none}
-.splash-langs{display:flex;gap:12px;margin-bottom:28px;opacity:0;transform:translateY(10px);transition:opacity .5s .35s,transform .5s .35s}
+.splash-langs{display:flex;gap:10px;margin-bottom:20px;opacity:0;transform:translateY(12px);transition:opacity .5s .28s,transform .5s .28s;direction:ltr}
 .splash-langs.show{opacity:1;transform:none}
-.lang-btn{padding:13px 36px;border-radius:50px;font-size:15px;font-weight:700;cursor:pointer;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;backdrop-filter:blur(10px);transition:all .2s;font-family:'GraphikArabic',sans-serif;letter-spacing:.2px}
-.lang-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
-.lang-btn.active{background:#f59e0b;border-color:#f59e0b;color:#000}
-.splash-social{display:flex;gap:10px;opacity:0;transition:opacity .5s .5s}
+.lang-btn{padding:13px 38px;border-radius:50px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.18);color:#fff;backdrop-filter:blur(12px);transition:all .2s;font-family:'GraphikArabic',sans-serif}
+.lang-btn:hover{background:rgba(255,255,255,.28)}
+.lang-btn.active{background:#f59e0b;color:#000}
+.splash-social{display:flex;gap:10px;margin-bottom:20px;opacity:0;transition:opacity .5s .42s}
 .splash-social.show{opacity:1}
-.splash-social a{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(8px);transition:.2s;text-decoration:none}
+.splash-social a{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(8px);transition:.2s;text-decoration:none}
 .splash-social a:hover{background:rgba(255,255,255,.28)}
-.splash-social a svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.splash-footer{position:relative;z-index:3;padding:16px 0 28px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.55);font-size:12px;font-weight:500;opacity:0;transition:opacity .5s .6s}
+.splash-social a svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+/* footer */
+.splash-footer{position:absolute;bottom:0;left:0;right:0;z-index:3;padding:12px 0 env(safe-area-inset-bottom,18px);display:flex;align-items:center;justify-content:center;gap:7px;color:rgba(255,255,255,.5);font-size:11.5px;font-weight:500;opacity:0;transition:opacity .5s .55s;direction:ltr}
 .splash-footer.show{opacity:1}
-.splash-footer img{width:20px;height:20px;border-radius:5px;object-fit:contain;opacity:.7}
+.splash-footer-icon{width:22px;height:22px;border-radius:6px;object-fit:cover;opacity:.85;flex-shrink:0}
+.splash-footer a{color:rgba(255,255,255,.75);text-decoration:none;font-weight:600}
+.splash-footer a:hover{color:#fff}
 
 /* ── THEMES ── */
 .theme-dark{--mbg:#0a0a0a;--mbg2:#111;--mbg3:#1a1a1a;--mfg:#f5f5f5;--mfg2:#aaa;--mfg3:#555;--mborder:#222;--macc:#f59e0b;--mcard:#111}
@@ -141,17 +150,20 @@ body.ltr .m-cats{direction:ltr}
   <div id="splashBg"></div>
   <video id="splashVideo" autoplay muted loop playsinline></video>
   <div class="splash-overlay"></div>
+  <button class="splash-play" id="splashPlay" onclick="toggleSplashVideo()">
+    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+  </button>
   <div class="splash-content">
     <div class="splash-name" id="splashName"></div>
     <div class="splash-langs" id="splashLangs">
-      <button class="lang-btn active" onclick="enterMenu('ar')">العربية</button>
       <button class="lang-btn" onclick="enterMenu('en')">English</button>
+      <button class="lang-btn active" onclick="enterMenu('ar')">العربية</button>
     </div>
     <div class="splash-social" id="splashSocial"></div>
   </div>
   <div class="splash-footer" id="splashFooter">
-    <img src="/kozhen-logo.png" alt="Kozhen">
-    <span>مُشغَّل بواسطة <a href="/" style="color:inherit;text-decoration:none;font-weight:700">Kozhen Studio</a></span>
+    <img class="splash-footer-icon" src="/kozhen-icon-app.jpeg" alt="Kozhen Studio">
+    <span>مُشغَّل بواسطة <a href="https://kozhenstudio.com" target="_blank" rel="noopener">Kozhen Studio</a></span>
   </div>
 </div>
 
@@ -195,40 +207,59 @@ async function loadMenu() {
 function showSplash({ user }) {
   document.title = user.restaurant_name;
 
-  // Video or hero image as splash background
   const splashBg = document.getElementById('splashBg');
   const vid = document.getElementById('splashVideo');
+  const playBtn = document.getElementById('splashPlay');
+
   if (user.video_url) {
     vid.src = user.video_url;
     vid.style.display = 'block';
+    vid.play().then(() => {
+      playBtn.classList.add('hidden');
+    }).catch(() => {
+      playBtn.classList.remove('hidden');
+    });
   } else if (user.hero_image) {
     splashBg.style.backgroundImage = `url(${user.hero_image})`;
     splashBg.style.backgroundSize = 'cover';
     splashBg.style.backgroundPosition = 'center';
     vid.style.display = 'none';
+    playBtn.classList.add('hidden');
   } else {
     vid.style.display = 'none';
+    playBtn.classList.add('hidden');
     splashBg.style.background = 'linear-gradient(135deg,#1a1a1a 0%,#0a0a0a 100%)';
   }
 
-  // Name
   const nameEl = document.getElementById('splashName');
   nameEl.textContent = user.restaurant_name;
 
-  // Social icons
   const socials = getSocials(user);
   const socialEl = document.getElementById('splashSocial');
   if (socials.length) {
     socialEl.innerHTML = socials.map(s => `<a href="${esc(s.href)}" target="_blank" rel="noopener">${s.icon}</a>`).join('');
   }
 
-  // Animate in
   requestAnimationFrame(() => {
     nameEl.classList.add('show');
     document.getElementById('splashLangs').classList.add('show');
     socialEl.classList.add('show');
     document.getElementById('splashFooter').classList.add('show');
   });
+}
+
+function toggleSplashVideo() {
+  const vid = document.getElementById('splashVideo');
+  const playBtn = document.getElementById('splashPlay');
+  const svg = playBtn.querySelector('svg polygon, svg path');
+  if (vid.paused) {
+    vid.play();
+    playBtn.classList.add('hidden');
+  } else {
+    vid.pause();
+    playBtn.classList.remove('hidden');
+    if (svg) svg.setAttribute('points','5 3 19 12 5 21 5 3');
+  }
 }
 
 function getSocials(user) {

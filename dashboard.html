@@ -323,15 +323,21 @@ body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color
           <div class="form-group"><label>فيسبوك</label><input type="text" id="profFacebook" placeholder="رابط الصفحة"></div>
           <div class="form-group"><label>الموقع (خرائط)</label><input type="url" id="profLocation" placeholder="رابط Google Maps"></div>
           <div class="form-group form-full">
-            <label>فيديو تعريفي</label>
+            <label>فيديو الخلفية (رفع أو رابط)</label>
             <div class="upload-box" id="profVideoBox" onclick="document.getElementById('profVideoFile').click()">
               <video id="profVideoPreview" style="display:none;width:100%;height:90px;object-fit:cover;border-radius:8px" muted></video>
               <div id="profVideoPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--fg3);font-size:12px;padding:14px 0">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                اختر فيديو (max 50MB)
+                اضغط لرفع فيديو (max 50MB)
               </div>
             </div>
             <input type="file" id="profVideoFile" accept="video/*" style="display:none" onchange="handleVideoSelect(this)">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+              <div style="flex:1;height:1px;background:var(--border)"></div>
+              <span style="color:var(--fg3);font-size:11px;flex-shrink:0">أو أدخل رابط فيديو</span>
+              <div style="flex:1;height:1px;background:var(--border)"></div>
+            </div>
+            <input type="url" id="profVideoUrl" placeholder="https://... رابط فيديو مباشر" style="margin-top:8px;width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--fg);font-size:13px;font-family:inherit" dir="ltr" oninput="onVideoUrlInput(this)">
             <input type="hidden" id="profVideo">
           </div>
           <div class="form-group form-full">
@@ -522,16 +528,19 @@ function populateProfileForm() {
   document.getElementById('profLocation').value = appUser.social_location || '';
   document.getElementById('profVideo').value = appUser.video_url || '';
   document.getElementById('profHero').value = appUser.hero_image || '';
-  // Show existing previews
   if (appUser.hero_image) {
     const img = document.getElementById('profHeroPreview');
     img.src = appUser.hero_image; img.style.display = 'block';
     document.getElementById('profHeroPlaceholder').style.display = 'none';
   }
   if (appUser.video_url) {
-    const vid = document.getElementById('profVideoPreview');
-    vid.src = appUser.video_url; vid.style.display = 'block';
-    document.getElementById('profVideoPlaceholder').style.display = 'none';
+    if (appUser.video_url.startsWith('http') && !appUser.video_url.includes('supabase')) {
+      document.getElementById('profVideoUrl').value = appUser.video_url;
+    } else {
+      const vid = document.getElementById('profVideoPreview');
+      vid.src = appUser.video_url; vid.style.display = 'block';
+      document.getElementById('profVideoPlaceholder').style.display = 'none';
+    }
   }
 }
 
@@ -639,7 +648,7 @@ async function saveProfile() {
     social_snapchat: document.getElementById('profSnapchat').value.trim(),
     social_facebook: document.getElementById('profFacebook').value.trim(),
     social_location: document.getElementById('profLocation').value.trim(),
-    video_url: document.getElementById('profVideo').value.trim(),
+    video_url: document.getElementById('profVideo').value.trim() || document.getElementById('profVideoUrl').value.trim(),
     hero_image: document.getElementById('profHero').value.trim(),
   });
   if (res && res.ok) { showToast('تم حفظ التغييرات'); init(); }
@@ -775,6 +784,16 @@ function handleImgSelect(input, previewId, placeholderId, hiddenId) {
       box.classList.remove('uploading');
       showToast(err.message || 'فشل الرفع', 'error');
     });
+  }
+}
+
+function onVideoUrlInput(input) {
+  const url = input.value.trim();
+  if (url) {
+    document.getElementById('profVideo').value = '';
+    const vid = document.getElementById('profVideoPreview');
+    vid.src = url; vid.style.display = 'block';
+    document.getElementById('profVideoPlaceholder').style.display = 'none';
   }
 }
 
