@@ -77,15 +77,18 @@ body{font-family:'GraphikArabic',sans-serif;min-height:100vh;overflow-x:hidden;b
 /* ── CATEGORIES ── */
 .m-cats{display:flex;gap:8px;overflow-x:auto;padding:12px 18px;border-top:1px solid var(--mborder);border-bottom:1px solid var(--mborder);scrollbar-width:none;background:var(--mbg)}
 .m-cats::-webkit-scrollbar{display:none}
-.m-cat-btn{display:flex;align-items:center;gap:6px;padding:7px 15px;border-radius:50px;border:1.5px solid var(--mborder);background:var(--mbg2);color:var(--mfg2);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.15s;flex-shrink:0}
+.m-cat-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:50px;border:1.5px solid var(--mborder);background:var(--mbg2);color:var(--mfg2);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.15s;flex-shrink:0}
 .m-cat-btn.active{background:var(--macc);color:#000;border-color:var(--macc)}
 .m-cat-btn:hover:not(.active){border-color:var(--mfg3);color:var(--mfg)}
+.m-cat-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 
 /* ── CONTENT ── */
 .m-content{padding:20px 18px}
 .m-cat-section{margin-bottom:36px}
-.m-cat-title{display:flex;align-items:center;gap:10px;font-size:.95rem;font-weight:700;color:var(--mfg);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--mborder)}
-.m-cat-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.m-cat-title{display:flex;align-items:center;gap:12px;font-size:.95rem;font-weight:700;color:var(--mfg);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--mborder)}
+.m-cat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.m-cat-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.m-cat-icon img{width:26px;height:26px;object-fit:contain;border-radius:4px}
 
 /* ── PRODUCTS ── */
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
@@ -97,7 +100,8 @@ body{font-family:'GraphikArabic',sans-serif;min-height:100vh;overflow-x:hidden;b
 .p-card-img-wrap{position:relative;overflow:hidden}
 .p-card-img{width:100%;height:140px;object-fit:cover;transition:transform .3s}
 .p-card:hover .p-card-img{transform:scale(1.04)}
-.p-card-img-placeholder{width:100%;height:110px;background:var(--mbg3);display:flex;align-items:center;justify-content:center;font-size:28px}
+.p-card-img-placeholder{width:100%;height:110px;background:var(--mbg3);display:flex;align-items:center;justify-content:center}
+.p-card-img-placeholder svg{width:36px;height:36px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
 .p-card-body{padding:12px;flex:1;display:flex;flex-direction:column}
 .p-card-name{font-size:.88rem;font-weight:700;color:var(--mfg);margin-bottom:4px;line-height:1.3}
 .p-card-desc{font-size:11.5px;color:var(--mfg3);line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -150,9 +154,6 @@ body.ltr .m-cats{direction:ltr}
   <div id="splashBg"></div>
   <video id="splashVideo" autoplay muted loop playsinline></video>
   <div class="splash-overlay"></div>
-  <button class="splash-play" id="splashPlay" onclick="toggleSplashVideo()">
-    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-  </button>
   <div class="splash-content">
     <div class="splash-name" id="splashName"></div>
     <div class="splash-langs" id="splashLangs">
@@ -171,11 +172,21 @@ body.ltr .m-cats{direction:ltr}
 <div id="menuWrap"></div>
 
 <script>
-const ICON_MAP = { utensils:'🍽', coffee:'☕', leaf:'🥗', cookie:'🍪', pizza:'🍕', burger:'🍔', fish:'🐟', chicken:'🍗' };
-function getIcon(icon, size) {
-  if (!icon) return '🍽';
-  if (icon.startsWith('http')) return `<img src="${icon}" style="width:${size||22}px;height:${size||22}px;object-fit:contain;border-radius:3px;vertical-align:middle">`;
-  return ICON_MAP[icon] || icon;
+const ICON_SVG = {
+  utensils: `<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2s2-.9 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6h3v7"/></svg>`,
+  coffee:   `<svg viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`,
+  leaf:     `<svg viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>`,
+  cookie:   `<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01M16 15.5v.01M12 12v.01"/></svg>`,
+  pizza:    `<svg viewBox="0 0 24 24"><path d="M12 2 2 20h20L12 2z"/><circle cx="12" cy="10.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="8.5" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="16" r="1.2" fill="currentColor" stroke="none"/><path d="M2 20h20"/></svg>`,
+  burger:   `<svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M4 12h16M5 9C5 6 8 4 12 4s7 2 7 5M5 15c0 3 3 5 7 5s7-2 7-5"/></svg>`,
+  fish:     `<svg viewBox="0 0 24 24"><path d="M6.5 12C6.5 7.5 12 3 20 2c-1 8-5.5 12.5-13.5 10z"/><path d="M6.5 12c-5 0-5 7 0 8-2.5-3-2.5-5 0-8z"/><circle cx="17" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>`,
+  chicken:  `<svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6c0 3 2 5 5 5.5L7 21h2l4.5-5c.2 0 .3 0 .5 0a6 6 0 0 0 0-12z"/><path d="M18 3c0 0 2 1 2 3s-2 3-2 3"/></svg>`,
+};
+const ICON_DEFAULT = `<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2s2-.9 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6h3v7"/></svg>`;
+function getIcon(icon) {
+  if (!icon) return ICON_DEFAULT;
+  if (icon.startsWith('http')) return `<img src="${icon}" style="width:26px;height:26px;object-fit:contain;border-radius:4px;display:block">`;
+  return ICON_SVG[icon] || (icon.length <= 4 ? `<span style="font-size:22px;line-height:1">${icon}</span>` : ICON_DEFAULT);
 }
 const LABELS = {
   ar: { menu:'قائمة الطعام', currency:'', empty:'لا يوجد منتجات بعد', powered:'مُشغَّل بواسطة' },
@@ -209,25 +220,25 @@ function showSplash({ user }) {
 
   const splashBg = document.getElementById('splashBg');
   const vid = document.getElementById('splashVideo');
-  const playBtn = document.getElementById('splashPlay');
 
   if (user.video_url) {
+    vid.muted = true;
+    vid.loop = true;
+    vid.playsInline = true;
+    vid.setAttribute('playsinline','');
     vid.src = user.video_url;
     vid.style.display = 'block';
-    vid.play().then(() => {
-      playBtn.classList.add('hidden');
-    }).catch(() => {
-      playBtn.classList.remove('hidden');
-    });
+    vid.load();
+    const tryPlay = () => vid.play().catch(() => {});
+    vid.addEventListener('canplay', tryPlay, { once: true });
+    setTimeout(tryPlay, 800);
   } else if (user.hero_image) {
     splashBg.style.backgroundImage = `url(${user.hero_image})`;
     splashBg.style.backgroundSize = 'cover';
     splashBg.style.backgroundPosition = 'center';
     vid.style.display = 'none';
-    playBtn.classList.add('hidden');
   } else {
     vid.style.display = 'none';
-    playBtn.classList.add('hidden');
     splashBg.style.background = 'linear-gradient(135deg,#1a1a1a 0%,#0a0a0a 100%)';
   }
 
@@ -248,19 +259,6 @@ function showSplash({ user }) {
   });
 }
 
-function toggleSplashVideo() {
-  const vid = document.getElementById('splashVideo');
-  const playBtn = document.getElementById('splashPlay');
-  const svg = playBtn.querySelector('svg polygon, svg path');
-  if (vid.paused) {
-    vid.play();
-    playBtn.classList.add('hidden');
-  } else {
-    vid.pause();
-    playBtn.classList.remove('hidden');
-    if (svg) svg.setAttribute('points','5 3 19 12 5 21 5 3');
-  }
-}
 
 function getSocials(user) {
   const defs = [
@@ -318,7 +316,7 @@ function renderMenu({ user, products, categories }, lang) {
 
   const catBtns = catKeys.map(k => {
     const c = catsMap[k] || { name: k, icon: 'utensils', color: '#8b5cf6' };
-    return `<button class="m-cat-btn" onclick="scrollToSection('${k}')">${getIcon(c.icon,18)} ${esc(c.name)}</button>`;
+    return `<button class="m-cat-btn" onclick="scrollToSection('${k}')">${getIcon(c.icon)} ${esc(c.name)}</button>`;
   }).join('');
 
   const sectionsHtml = catKeys.map(k => {
@@ -326,13 +324,13 @@ function renderMenu({ user, products, categories }, lang) {
     const prods = grouped[k] || [];
     return `<div class="m-cat-section" id="cat-${k}">
       <div class="m-cat-title">
-        <div class="m-cat-icon" style="background:${c.color}22">${getIcon(c.icon,20)}</div>
+        <div class="m-cat-icon" style="background:${c.color}22;color:${c.color}">${getIcon(c.icon)}</div>
         ${esc(c.name)}
       </div>
       <div class="products-grid">${prods.map(p => `<div class="p-card">
         ${p.image_url
           ? `<div class="p-card-img-wrap"><img class="p-card-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy"></div>`
-          : `<div class="p-card-img-placeholder">${getIcon(catsMap[p.category]?.icon,28)}</div>`}
+          : `<div class="p-card-img-placeholder" style="color:${catsMap[p.category]?.color||'#8b5cf6'}">${getIcon(catsMap[p.category]?.icon)}</div>`}
         <div class="p-card-body">
           <div class="p-card-name">${esc(p.name)}</div>
           ${p.description ? `<div class="p-card-desc">${esc(p.description)}</div>` : ''}
@@ -362,20 +360,9 @@ function renderMenu({ user, products, categories }, lang) {
     ${heroMedia ? `<div class="m-hero">${heroMedia}</div>` : ''}
     <div class="m-hero-info">
       <div class="m-rest-name">${esc(user.restaurant_name)}</div>
-      ${socialsHtml}
     </div>
     ${catKeys.length > 1 ? `<div class="m-cats">${catBtns}</div>` : ''}
     <div class="m-content">${sectionsHtml}</div>
-    <div class="m-contact">
-      <a class="m-contact-card m-contact-phone" href="tel:+9647508953486">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l1.17-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.01z"/></svg>
-        +964 750 895 3486
-      </a>
-      <a class="m-contact-card m-contact-email" href="mailto:kozhenstudio@gmail.com">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        kozhenstudio@gmail.com
-      </a>
-    </div>
     <div class="m-footer">
       <img src="/kozhen-logo.png" alt="Kozhen">
       <span>${L.powered} <a href="/">Kozhen Studio</a></span>

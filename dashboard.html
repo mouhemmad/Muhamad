@@ -324,8 +324,14 @@ body{font-family:'GraphikArabic','Tajawal',sans-serif;background:var(--bg);color
           <div class="form-group"><label>الموقع (خرائط)</label><input type="url" id="profLocation" placeholder="رابط Google Maps"></div>
           <div class="form-group form-full">
             <label>فيديو الخلفية (رفع أو رابط)</label>
+            <div id="profVideoPreviewWrap" style="display:none;position:relative;border-radius:10px;overflow:hidden;background:#000;margin-bottom:8px">
+              <video id="profVideoPreview" style="width:100%;height:100px;object-fit:cover;display:block" muted playsinline></video>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="rgba(255,255,255,.7)" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <button onclick="clearVideo()" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.65);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;padding:0">✕</button>
+            </div>
             <div class="upload-box" id="profVideoBox" onclick="document.getElementById('profVideoFile').click()">
-              <video id="profVideoPreview" style="display:none;width:100%;height:90px;object-fit:cover;border-radius:8px" muted></video>
               <div id="profVideoPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--fg3);font-size:12px;padding:14px 0">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
                 اضغط لرفع فيديو (max 50MB)
@@ -536,11 +542,8 @@ function populateProfileForm() {
   if (appUser.video_url) {
     if (appUser.video_url.startsWith('http') && !appUser.video_url.includes('supabase')) {
       document.getElementById('profVideoUrl').value = appUser.video_url;
-    } else {
-      const vid = document.getElementById('profVideoPreview');
-      vid.src = appUser.video_url; vid.style.display = 'block';
-      document.getElementById('profVideoPlaceholder').style.display = 'none';
     }
+    showVideoPreview(appUser.video_url);
   }
 }
 
@@ -787,13 +790,28 @@ function handleImgSelect(input, previewId, placeholderId, hiddenId) {
   }
 }
 
+function showVideoPreview(url) {
+  const wrap = document.getElementById('profVideoPreviewWrap');
+  const vid = document.getElementById('profVideoPreview');
+  vid.src = url;
+  wrap.style.display = 'block';
+  document.getElementById('profVideoBox').style.display = 'none';
+}
+
+function clearVideo() {
+  document.getElementById('profVideo').value = '';
+  document.getElementById('profVideoUrl').value = '';
+  document.getElementById('profVideoPreview').src = '';
+  document.getElementById('profVideoPreviewWrap').style.display = 'none';
+  document.getElementById('profVideoBox').style.display = '';
+  document.getElementById('profVideoFile').value = '';
+}
+
 function onVideoUrlInput(input) {
   const url = input.value.trim();
   if (url) {
     document.getElementById('profVideo').value = '';
-    const vid = document.getElementById('profVideoPreview');
-    vid.src = url; vid.style.display = 'block';
-    document.getElementById('profVideoPlaceholder').style.display = 'none';
+    showVideoPreview(url);
   }
 }
 
@@ -802,18 +820,18 @@ function handleVideoSelect(input) {
   if (!file) return;
   if (file.size > 50 * 1024 * 1024) { showToast('الحد الأقصى للفيديو 50MB', 'error'); input.value = ''; return; }
   const objectUrl = URL.createObjectURL(file);
-  const vid = document.getElementById('profVideoPreview');
-  vid.src = objectUrl; vid.style.display = 'block';
-  document.getElementById('profVideoPlaceholder').style.display = 'none';
-  const box = input.closest('.form-group').querySelector('.upload-box');
+  showVideoPreview(objectUrl);
+  const box = document.getElementById('profVideoBox');
   box.classList.add('uploading');
   uploadFile(file).then(url => {
     document.getElementById('profVideo').value = url;
+    document.getElementById('profVideoPreview').src = url;
     box.classList.remove('uploading');
     showToast('تم رفع الفيديو ✓');
   }).catch(err => {
     box.classList.remove('uploading');
     showToast(err.message || 'فشل رفع الفيديو', 'error');
+    clearVideo();
   });
 }
 
