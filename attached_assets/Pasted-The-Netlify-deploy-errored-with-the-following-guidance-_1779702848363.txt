@@ -1,0 +1,123 @@
+The Netlify deploy errored, with the following guidance provided:
+
+Diagnosis
+
+- Relevant log lines: [line 54](#L54) shows npm reporting "Missing script: "build⁠"", and [line 72](#L72) shows Netlify's configured build command is `npm run build⁠` (note the invisible/extra character after build). The failure originates from npm not finding a "build" script in package.json (or the command being different due to a hidden character), causing the build to exit with code 2.
+- Error type and cause: Missing npm script / bad build command. Either:
+  1) package.json does not include a "build" script, or
+  2) the Netlify build command includes a hidden/Unicode character so npm is looking for a script literally named "build⁠" (with an extra character), which does not exist.
+
+Verify package.json
+- Open your repo package.json to confirm available scripts: https://github.com/mouhemmad/Muhamad/blob/main/package.json
+
+Solution
+
+1) Quick check for the hidden character (most likely):
+   - In the Netlify App > Site settings > Build & deploy > Continuous Deployment > Build settings, edit the Build command. Delete the current value and retype exactly:
+     npm run build
+   - Save and redeploy. This removes any stray invisible Unicode character that makes npm search for a different script name (this is the simplest fix if your package.json actually has a "build" script).
+
+2) If your project has no build step (static site):
+   - Remove the build command in Netlify (leave it blank) or set it to an empty string, and set the Publish directory to the folder containing your site (e.g., "/" or "public" if your files live there). Then redeploy.
+
+3) If your project requires a build step but package.json currently lacks a "build" script:
+   - First verify the package.json in the repo contains the correct scripts (see link above).
+   - Add an appropriate build script to package.json and commit. Examples (choose the one matching your toolchain):
+```json
+{
+  "scripts": {
+    "build": "vite build"         // for Vite projects
+  }
+}
+```
+```json
+{
+  "scripts": {
+    "build": "react-scripts build" // for Create React App
+  }
+}
+```
+```json
+{
+  "scripts": {
+    "build": "next build"         // for Next.js (and set up proper adapter)
+  }
+}
+```
+   - Commit and push package.json, then redeploy on Netlify.
+
+Notes
+- If you change the build command in Netlify, be careful to re-type it (do not copy/paste) to avoid invisible characters.
+- If you do need to change Node versions, see Netlify docs for Node version management: https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript
+
+If you want, tell me which scripts are shown in your package.json (paste the "scripts" section) and I’ll provide the exact build script you should add or the correct Netlify build command.
+
+The relevant error logs are:
+
+Line 17: Now using node v22.22.3 (npm v10.9.8)
+Line 18: Enabling Node.js Corepack
+Line 19: No npm workspaces detected
+Line 20: Installing npm packages using npm version 10.9.8
+Line 21: up to date in 246ms
+Line 22: npm packages installed
+Line 23: Successfully installed dependencies
+Line 24: Detected 0 framework(s)
+Line 25: Starting build script
+Line 26: Section completed: initializing
+Line 27: Failed during stage 'building site': Build script returned non-zero exit code: 2
+Line 28: ​
+Line 29: Netlify Build                                                 
+Line 30: ────────────────────────────────────────────────────────────────
+Line 31: ​
+Line 32: ❯ Version
+Line 33:   @netlify/build 35.13.4
+Line 34: ​
+Line 35: ❯ Flags
+Line 36:   accountId: 690ccaa041943778e0005f2f
+Line 37:   baseRelDir: true
+Line 44: ❯ Config file
+Line 45:   /opt/build/repo/netlify.toml
+Line 46: ​
+Line 47: ❯ Context
+Line 48:   production
+Line 49: ​
+Line 50: Build command from Netlify app                                
+Line 51: ────────────────────────────────────────────────────────────────
+Line 52: ​
+Line 53: $ npm run build⁠
+Line 54: npm error Missing script: "build⁠"
+Line 55: npm error
+Line 56: npm error To see a list of scripts, run:
+Line 57: npm error   npm run
+Line 58: npm error A complete log of this run can be found in: /opt/buildhome/.npm/_logs/2026-05-25T09_41_27_480Z-debug-0.log
+Line 59: ​
+Line 60: "build.command" failed                                        
+Line 61: ────────────────────────────────────────────────────────────────
+Line 62: ​
+Line 63:   Error message
+Line 64:   Command failed with exit code 1: npm run build⁠
+Line 65: ​
+Line 66:   Error location
+Line 67:   In Build command from Netlify app:
+Line 68:   npm run build⁠
+Line 69: ​
+Line 70:   Resolved config
+Line 71:   build:
+Line 72:     command: npm run build⁠
+Line 73:     commandOrigin: ui
+Line 74:     environment:
+Line 75:       - ADMIN_PASS
+Line 76:       - ADMIN_USER
+Line 117:     - from: /admin
+Line 118:       status: 200
+Line 119:       to: /admin.html
+Line 120:     - from: /subscribe
+Line 121:       status: 200
+Line 122:       to: /subscribe.html
+Line 123:     - from: /@:username
+Line 124:       status: 200
+Line 125:       to: /menu.html?u=:username
+Line 126:   redirectsOrigin: config
+Line 127: Build failed due to a user error: Build script returned non-zero exit code: 2
+Line 128: Failing build: Failed to build site
+Line 129: Finished processing build request in 11.316s
